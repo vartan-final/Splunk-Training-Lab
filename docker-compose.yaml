@@ -1,0 +1,124 @@
+version: '3.8'
+
+services:
+  proxy:
+    image: traefik:v2.11
+    container_name: proxy
+    # volumes:
+    #   - ./traefik/traefik.yml:/etc/traefik/traefik.yml
+    #   - ./traefik/splunk.yml:/etc/traefik/splunk.yml
+    ports:
+      - 8080:8080
+      - 80:80
+    networks:
+      - splunk_network
+
+  cm:
+    image: splunk/splunk:latest
+    container_name: cm
+    ports:
+      - 8000
+      - 8089
+    volumes:
+      - splunk_data_cm:/opt/splunk/var
+    networks:
+      - splunk_network
+    environment:
+      SPLUNK_START_ARGS: --accept-license
+      SPLUNK_PASSWORD: password
+  
+  indexer-1:
+    image: splunk/splunk:latest
+    container_name: indexer-1
+    ports:
+      - 8000
+      - 8089
+    volumes:
+      - splunk_data_indexer-1:/opt/splunk/var
+    networks:
+      - splunk_network
+    environment:
+      SPLUNK_START_ARGS: --accept-license
+      SPLUNK_PASSWORD: password
+  
+  indexer-2:
+    image: splunk/splunk:latest
+    container_name: indexer-2
+    ports:
+      - 8000
+      - 8089
+    volumes:
+      - splunk_data_indexer-2:/opt/splunk/var
+    networks:
+      - splunk_network
+    environment:
+      SPLUNK_START_ARGS: --accept-license
+      SPLUNK_PASSWORD: password
+
+  search-head-1:
+    image: splunk/splunk:latest
+    container_name: sh1
+    ports:
+      - 8000
+      - 8089
+    volumes:
+      - splunk_data_search-head-1:/opt/splunk/var
+    networks:
+      - splunk_network
+    environment:
+      SPLUNK_START_ARGS: --accept-license
+      SPLUNK_PASSWORD: password
+
+  deployment:
+    image: splunk/splunk:latest
+    container_name: deployment
+    ports:
+      - 8000
+      - 8089
+    volumes:
+      - splunk_data_deployment:/opt/splunk/var
+    networks:
+      - splunk_network
+    environment:
+      SPLUNK_START_ARGS: --accept-license
+      SPLUNK_PASSWORD: password
+
+  monitor:
+    image: splunk/splunk:latest
+    container_name: monitor
+    ports:
+      - 8000
+      - 8089
+    volumes:
+      - splunk_data_monitor:/opt/splunk/var
+    networks:
+      - splunk_network
+    environment:
+      SPLUNK_START_ARGS: --accept-license
+      SPLUNK_PASSWORD: password
+
+  license:
+      image: splunk/splunk:latest
+      container_name: license
+      ports:
+        - 8000
+        - 8089
+      volumes:
+        - splunk_data_license:/opt/splunk/var
+      networks:
+        - splunk_network
+      environment:
+        SPLUNK_START_ARGS: --accept-license
+        SPLUNK_PASSWORD: password
+
+volumes:
+  splunk_data_cm:
+  splunk_data_indexer-1:
+  splunk_data_indexer-2:
+  splunk_data_search-head-1:
+  splunk_data_deployment:
+  splunk_data_monitor:
+  splunk_data_license:
+
+networks:
+  splunk_network:
